@@ -29,6 +29,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* --- UI LAYOUT --- */
         #phone-wrapper {
             width: 100%;
             height: 100%;
@@ -58,11 +59,18 @@
             opacity: 0.5;
         }
 
-        #particle-canvas {
+        #particle-canvas,
+        #wave-canvas {
             position: absolute;
             inset: 0;
             z-index: 1;
             pointer-events: none;
+        }
+
+        #wave-canvas {
+            z-index: 2;
+            bottom: 0;
+            height: 150px;
         }
 
         #ui-layer {
@@ -73,19 +81,7 @@
             flex-direction: column;
         }
 
-        /* --- VISUALIZERS --- */
-        #wave-canvas {
-            position: absolute;
-            bottom: 40px;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            z-index: 2;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        /* --- LYRICS STAGES --- */
+        /* LYRICS STAGES */
         .lyrics-stage {
             flex: 1;
             position: relative;
@@ -96,7 +92,7 @@
             z-index: 5;
         }
 
-        /* ANIMATION: SCROLL */
+        /* ANIMATION STYLES (Keep existing robust logic) */
         .scroll-container {
             width: 100%;
             display: flex;
@@ -122,7 +118,6 @@
             transform: scale(1.1);
         }
 
-        /* ANIMATION: FOCUS */
         .focus-container {
             width: 100%;
             text-align: center;
@@ -135,8 +130,115 @@
             line-height: 1;
         }
 
-        /* ANIMATION: CLASSIC */
+        /* CLASSIC MODE - VERTICAL SCROLL */
+        .classic-stage {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .classic-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .classic-word {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.35);
+            padding: 8px 16px;
+            text-align: center;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+
+        .classic-word.active {
+            color: #fff;
+            font-size: 2.2rem;
+            text-shadow: 0 0 20px var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* HORIZONTAL SCROLL MODE */
+        .horizontal-stage {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .horizontal-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 30px;
+            white-space: nowrap;
+        }
+
+        .horizontal-word {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.35);
+            padding: 8px 16px;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+            flex-shrink: 0;
+        }
+
+        .horizontal-word.active {
+            color: #fff;
+            font-size: 2.5rem;
+            text-shadow: 0 0 25px var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* TYPEWRITER MODE */
+        .typewriter-container {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .typewriter-word {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 20px var(--primary);
+            display: inline-block;
+        }
+
+        .typewriter-char {
+            opacity: 0;
+            display: inline-block;
+        }
+
+        .typewriter-char.visible {
+            opacity: 1;
+        }
+
+        /* BOUNCE MODE */
+        .bounce-container {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bounce-word {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 30px var(--primary);
+        }
+
+        /* WAVE MODE */
+        .wave-container {
             position: absolute;
             bottom: 15%;
             width: 100%;
@@ -148,28 +250,182 @@
             gap: 8px;
         }
 
-        .classic-word {
+        .wave-word {
             font-size: 1.5rem;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.5);
+            display: inline-block;
+            transition: all 0.3s ease;
         }
 
-        .classic-word.active {
+        .wave-word.active {
             color: var(--primary);
-            text-shadow: 0 0 10px var(--primary);
-            transform: scale(1.05);
+            text-shadow: 0 0 15px var(--primary);
         }
 
-        /* SETUP & UTILS */
+        /* SYNC & FULLSCREEN CONTROLS */
+        .sync-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .sync-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sync-value {
+            font-size: 0.75rem;
+            min-width: 50px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-fullscreen {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* COLOR PICKER */
+        .color-picker-wrapper {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* CONTROLS TOGGLE */
+        #controls {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #controls.hidden {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .btn-toggle-controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 40;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s;
+        }
+
+        .btn-toggle-controls:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-toggle-controls.controls-visible {
+            bottom: auto;
+            top: 10px;
+        }
+
+        /* CONTROLS (New) */
+        #controls {
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            border-radius: 3px;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-control:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+        }
+
+        /* SETUP */
         #setup-screen {
             position: absolute;
             inset: 0;
-            background: rgba(10, 10, 10, 0.98);
+            background: rgba(5, 5, 5, 0.95);
             z-index: 50;
             padding: 24px;
+            padding-top: 40px;
+            padding-bottom: 40px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            overflow-y: auto;
+            gap: 8px;
         }
 
         .glass-panel {
@@ -181,12 +437,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background: var(--primary);
-            width: 0%;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -199,13 +450,41 @@
 
         <div id="ui-layer" style="display:none;">
             <div id="lyrics-stage" class="lyrics-stage"></div>
-            <canvas id="wave-canvas"></canvas> <!-- RESTORATION -->
-            <div class="progress-bar" id="progress"></div>
+            <canvas id="wave-canvas"></canvas>
+
+            <!-- TOGGLE CONTROLS BUTTON -->
+            <button id="btn-toggle-controls" class="btn-toggle-controls controls-visible">⚙️</button>
+
+            <!-- NEW CONTROLS -->
+            <div id="controls">
+                <div class="progress-container" id="seek-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="flex justify-between items-center mt-2">
+                    <div class="flex gap-2">
+                        <button id="btn-play-pause" class="btn-control w-12 text-center">⏸</button>
+                        <button id="btn-restart" class="btn-control">↺</button>
+                        <div class="sync-controls">
+                            <button id="btn-sync-minus" class="sync-btn">-</button>
+                            <span id="sync-value" class="sync-value">0.0s</span>
+                            <button id="btn-sync-plus" class="sync-btn">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button id="btn-fullscreen" class="btn-control btn-fullscreen">⛶</button>
+                        <button id="btn-export" class="btn-control btn-primary flex gap-2 items-center">
+                            <span>🔴</span> REC
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- SETUP -->
         <div id="setup-screen">
-            <h1 class="text-4xl font-black italic mb-8 text-center text-white">KARA<span
+            <h1 class="text-4xl font-black italic mb-6 text-center text-white">KARA<span
                     class="text-purple-500">GEN</span></h1>
 
             <label class="glass-panel">
@@ -231,9 +510,13 @@
                 <div class="flex-1">
                     <div class="text-[10px] uppercase text-gray-400 font-bold">Animation</div>
                     <select id="select-animation" class="bg-transparent w-full font-bold outline-none text-purple-400">
-                        <option value="scroll">📜 Scroll (Liste Défilante)</option>
+                        <option value="scroll">📜 Scroll (Liste)</option>
                         <option value="focus">🎯 Focus (Big Single)</option>
-                        <option value="classic">🎤 Classic (Sous-titres)</option>
+                        <option value="classic">🎤 Classic (Karaoke)</option>
+                        <option value="typewriter">⌨️ Typewriter</option>
+                        <option value="bounce">🏀 Bounce</option>
+                        <option value="wave">🌊 Wave</option>
+                        <option value="horizontal">↔️ Horizontal</option>
                     </select>
                 </div>
             </label>
@@ -247,8 +530,55 @@
                 <input type="file" id="input-video" accept="video/*" class="hidden">
             </label>
 
-            <button id="btn-start"
-                class="mt-4 bg-purple-600 w-full py-4 rounded-xl font-bold text-lg shadow-lg">START</button>
+            <div class="glass-panel flex-col !items-start">
+                <div class="flex items-center gap-2 w-full">
+                    <span class="text-2xl">🎨</span>
+                    <div class="text-[10px] uppercase text-gray-400 font-bold">Couleur</div>
+                </div>
+                <div id="color-picker" class="color-picker-wrapper mt-2">
+                    <div class="color-option selected" data-color="#a855f7" style="background:#a855f7"></div>
+                    <div class="color-option" data-color="#ec4899" style="background:#ec4899"></div>
+                    <div class="color-option" data-color="#3b82f6" style="background:#3b82f6"></div>
+                    <div class="color-option" data-color="#10b981" style="background:#10b981"></div>
+                    <div class="color-option" data-color="#f59e0b" style="background:#f59e0b"></div>
+                    <div class="color-option" data-color="#ef4444" style="background:#ef4444"></div>
+                    <div class="color-option" data-color="#06b6d4" style="background:#06b6d4"></div>
+                    <div class="color-option" data-color="#ffffff" style="background:#ffffff"></div>
+                </div>
+            </div>
+
+            <label class="glass-panel">
+                <span class="text-2xl">🎛️</span>
+                <div class="flex-1">
+                    <div class="text-[10px] uppercase text-gray-400 font-bold">Visualisation Audio</div>
+                    <select id="select-wave-type" class="bg-transparent w-full font-bold outline-none text-purple-400">
+                        <option value="wave">🌊 Onde</option>
+                        <option value="bars">📊 Barres</option>
+                        <option value="circle">⭕ Cercle</option>
+                        <option value="none">❌ Aucune</option>
+                    </select>
+                </div>
+            </label>
+
+            <div class="glass-panel flex-col !items-start">
+                <div class="flex items-center gap-2 w-full">
+                    <span class="text-2xl">🌈</span>
+                    <div class="text-[10px] uppercase text-gray-400 font-bold">Couleur Onde</div>
+                </div>
+                <div id="wave-color-picker" class="color-picker-wrapper mt-2">
+                    <div class="color-option selected" data-color="#a855f7" style="background:#a855f7"></div>
+                    <div class="color-option" data-color="#ec4899" style="background:#ec4899"></div>
+                    <div class="color-option" data-color="#3b82f6" style="background:#3b82f6"></div>
+                    <div class="color-option" data-color="#10b981" style="background:#10b981"></div>
+                    <div class="color-option" data-color="#f59e0b" style="background:#f59e0b"></div>
+                    <div class="color-option" data-color="#ef4444" style="background:#ef4444"></div>
+                    <div class="color-option" data-color="#06b6d4" style="background:#06b6d4"></div>
+                    <div class="color-option" data-color="#ffffff" style="background:#ffffff"></div>
+                </div>
+            </div>
+
+            <button id="btn-start" class="mt-4 bg-purple-600 w-full py-4 rounded-xl font-bold text-lg shadow-lg">START
+                PROJET</button>
         </div>
     </div>
 
@@ -257,81 +587,55 @@
     <script>
         // --- STATE ---
         const state = {
-            words: [],
-            isPlaying: false,
-            mode: 'scroll',
-            domElements: [],
-            audioCtx: null,
-            analyser: null,
-            dataArray: null
+            words: [], isPlaying: false, mode: 'scroll', domElements: [], audioCtx: null, analyser: null, dataArray: null,
+            recorder: null, recordedChunks: [], syncOffset: 0, primaryColor: '#a855f7',
+            waveType: 'wave', waveColor: '#a855f7'
         };
 
         const ui = {
             stage: document.getElementById('lyrics-stage'),
-            inputs: {
-                audio: document.getElementById('input-audio'),
-                json: document.getElementById('input-json'),
-                video: document.getElementById('input-video'),
-                anim: document.getElementById('select-animation')
-            },
-            labels: {
-                audio: document.getElementById('label-audio'),
-                json: document.getElementById('label-json'),
-                video: document.getElementById('label-video')
-            },
+            inputs: { audio: document.getElementById('input-audio'), json: document.getElementById('input-json'), video: document.getElementById('input-video'), anim: document.getElementById('select-animation') },
+            labels: { audio: document.getElementById('label-audio'), json: document.getElementById('label-json'), video: document.getElementById('label-video') },
             video: document.getElementById('bg-layer-video'),
             audio: document.getElementById('audio-player'),
             setup: document.getElementById('setup-screen'),
             app: document.getElementById('ui-layer'),
-            progress: document.getElementById('progress')
+            progress: document.getElementById('progress-fill'),
+            seekBar: document.getElementById('seek-bar'),
+            btnPlay: document.getElementById('btn-play-pause'),
+            btnRec: document.getElementById('btn-export')
         };
 
-        // --- ENGINES ---
+        // --- ENGINES (Condensed for readability, identical logic) ---
         const Engines = {
             scroll: {
-                init: (container, words) => {
-                    container.className = 'lyrics-stage flex-col';
-                    container.innerHTML = '<div id="scroll-wrapper" class="scroll-container"></div>';
+                init: (con, words) => {
+                    con.className = 'lyrics-stage flex-col'; con.innerHTML = '<div id="scroll-wrapper" class="scroll-container"></div>';
                     const wrapper = document.getElementById('scroll-wrapper');
                     state.domElements = [];
                     words.forEach((w, i) => {
-                        const el = document.createElement('div');
-                        el.innerText = w.text;
-                        el.className = 'scroll-word';
-                        el.dataset.index = i;
-                        wrapper.appendChild(el);
-                        state.domElements.push(el);
+                        const el = document.createElement('div'); el.innerText = w.text; el.className = 'scroll-word'; el.dataset.index = i;
+                        wrapper.appendChild(el); state.domElements.push(el);
                     });
                 },
                 update: (time, words) => {
                     const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
-                    let targetIdx = activeIdx;
-                    if (targetIdx === -1) targetIdx = words.findIndex(w => w.start > time) - 1;
+                    let targetIdx = activeIdx !== -1 ? activeIdx : (words.findIndex(w => w.start > time) - 1);
                     if (targetIdx < 0) targetIdx = 0;
-
                     const wrapper = document.getElementById('scroll-wrapper');
                     state.domElements.forEach((el, i) => {
-                        if (i === activeIdx) el.classList.add('active');
-                        else el.classList.remove('active');
-
-                        const dist = Math.abs(i - targetIdx);
-                        el.style.opacity = dist > 4 ? 0.1 : 1 - (dist * 0.15);
+                        if (i === activeIdx) el.classList.add('active'); else el.classList.remove('active');
+                        const dist = Math.abs(i - targetIdx); el.style.opacity = dist > 4 ? 0.1 : 1 - (dist * 0.15);
                     });
-
                     const targetEl = state.domElements[targetIdx];
                     if (targetEl) {
-                        const itemY = targetEl.offsetTop;
-                        const itemH = targetEl.offsetHeight;
-                        const stageH = ui.stage.offsetHeight;
-                        const desiredY = (stageH / 2) - (itemY + itemH / 2);
+                        const desiredY = (ui.stage.offsetHeight / 2) - (targetEl.offsetTop + targetEl.offsetHeight / 2);
                         gsap.to(wrapper, { y: desiredY, duration: 0.5, ease: "power2.out" });
                     }
                 }
             },
             focus: {
-                init: (container) => {
-                    container.innerHTML = '<div id="focus-wrapper" class="focus-container"></div>';
-                },
+                init: (c) => { c.innerHTML = '<div id="focus-wrapper" class="focus-container"></div>'; },
                 update: (time, words) => {
                     const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
                     const wrapper = document.getElementById('focus-wrapper');
@@ -339,88 +643,247 @@
                         state.lastRenderedIdx = activeIdx;
                         const w = words[activeIdx];
                         wrapper.innerHTML = '';
-                        const el = document.createElement('div');
-                        el.innerText = w.text;
-                        const len = w.text.length;
-                        const size = len < 5 ? '5rem' : len < 10 ? '3.5rem' : '2.5rem';
-                        el.className = 'focus-word';
-                        el.style.fontSize = size;
-                        el.style.color = '#fff';
-                        el.style.textShadow = '0 0 30px var(--primary)';
+                        const el = document.createElement('div'); el.innerText = w.text;
+                        const len = w.text.length; const size = len < 5 ? '5rem' : len < 10 ? '3.5rem' : '2.5rem';
+                        el.className = 'focus-word'; el.style.fontSize = size; el.style.color = '#fff'; el.style.textShadow = '0 0 30px var(--primary)';
                         wrapper.appendChild(el);
                         gsap.fromTo(el, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.5)' });
                     }
                 }
             },
+            // --- CLASSIC ENGINE (VERTICAL SCROLL) ---
             classic: {
-                init: (container) => {
-                    container.innerHTML = '<div id="classic-wrapper" class="classic-container"></div>';
+                init: (c, words) => {
+                    c.className = 'lyrics-stage';
+                    c.innerHTML = '<div class="classic-stage"><div id="classic-wrapper" class="classic-container"></div></div>';
+                    const wrapper = document.getElementById('classic-wrapper');
+                    state.domElements = [];
+                    state.classicLastActive = -1;
+
+                    // Pre-render ALL words vertically
+                    words.forEach((w, i) => {
+                        const el = document.createElement('div');
+                        el.innerText = w.text;
+                        el.className = 'classic-word';
+                        el.dataset.index = i;
+                        wrapper.appendChild(el);
+                        state.domElements.push(el);
+                    });
                 },
                 update: (time, words) => {
                     const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
-                    let centerIdx = activeIdx;
-                    if (centerIdx === -1) centerIdx = words.findIndex(w => w.start > time) - 1;
-                    if (centerIdx < 0) centerIdx = 0;
-
-                    if (state.lastRenderedIdx === centerIdx && activeIdx === state.lastCheckActive) return;
-                    state.lastRenderedIdx = centerIdx;
-                    state.lastCheckActive = activeIdx;
-
                     const wrapper = document.getElementById('classic-wrapper');
-                    wrapper.innerHTML = '';
-                    const start = Math.max(0, centerIdx - 2);
-                    const end = Math.min(words.length, centerIdx + 5);
 
-                    for (let i = start; i < end; i++) {
-                        const w = words[i];
+                    // Find the target index (active or next upcoming)
+                    let targetIdx = activeIdx !== -1 ? activeIdx : (words.findIndex(w => w.start > time) - 1);
+                    if (targetIdx < 0) targetIdx = 0;
+
+                    // Update classes and opacity
+                    state.domElements.forEach((el, i) => {
+                        const distance = Math.abs(i - targetIdx);
+
+                        if (i === activeIdx) {
+                            el.classList.add('active');
+                        } else {
+                            el.classList.remove('active');
+                        }
+
+                        // Fade words based on distance
+                        el.style.opacity = distance > 4 ? 0.15 : Math.max(0.35, 1 - (distance * 0.18));
+                    });
+
+                    // Smooth scroll to keep active word centered
+                    const targetEl = state.domElements[targetIdx];
+                    if (targetEl && wrapper) {
+                        const desiredY = -(targetEl.offsetTop - (wrapper.offsetHeight / 2) + (targetEl.offsetHeight / 2));
+                        gsap.to(wrapper, { y: desiredY, duration: 0.5, ease: "power2.out" });
+                    }
+                }
+            },
+            // --- HORIZONTAL SCROLL ENGINE ---
+            horizontal: {
+                init: (c, words) => {
+                    c.className = 'lyrics-stage';
+                    c.innerHTML = '<div class="horizontal-stage"><div id="horizontal-wrapper" class="horizontal-container"></div></div>';
+                    const wrapper = document.getElementById('horizontal-wrapper');
+                    state.domElements = [];
+
+                    // Pre-render ALL words horizontally
+                    words.forEach((w, i) => {
                         const el = document.createElement('span');
                         el.innerText = w.text;
-                        el.className = 'classic-word';
-                        if (i === activeIdx) el.classList.add('active');
+                        el.className = 'horizontal-word';
+                        el.dataset.index = i;
                         wrapper.appendChild(el);
+                        state.domElements.push(el);
+                    });
+                },
+                update: (time, words) => {
+                    const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
+                    const wrapper = document.getElementById('horizontal-wrapper');
+                    const stage = wrapper.parentElement;
+
+                    // Find the target index
+                    let targetIdx = activeIdx !== -1 ? activeIdx : (words.findIndex(w => w.start > time) - 1);
+                    if (targetIdx < 0) targetIdx = 0;
+
+                    // Update classes and opacity
+                    state.domElements.forEach((el, i) => {
+                        const distance = Math.abs(i - targetIdx);
+
+                        if (i === activeIdx) {
+                            el.classList.add('active');
+                        } else {
+                            el.classList.remove('active');
+                        }
+
+                        // Fade words based on distance
+                        el.style.opacity = distance > 5 ? 0.15 : Math.max(0.3, 1 - (distance * 0.15));
+                    });
+
+                    // Smooth horizontal scroll to center active word
+                    const targetEl = state.domElements[targetIdx];
+                    if (targetEl && stage) {
+                        const stageWidth = stage.offsetWidth;
+                        const desiredX = (stageWidth / 2) - targetEl.offsetLeft - (targetEl.offsetWidth / 2);
+                        gsap.to(wrapper, { x: desiredX, duration: 0.5, ease: "power2.out" });
+                    }
+                }
+            },
+            // --- TYPEWRITER ENGINE ---
+            typewriter: {
+                init: (c) => { c.innerHTML = '<div id="typewriter-wrapper" class="typewriter-container"></div>'; },
+                update: (time, words) => {
+                    const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
+                    const wrapper = document.getElementById('typewriter-wrapper');
+
+                    if (activeIdx !== -1 && state.lastRenderedIdx !== activeIdx) {
+                        state.lastRenderedIdx = activeIdx;
+                        const w = words[activeIdx];
+                        wrapper.innerHTML = '';
+
+                        const wordEl = document.createElement('div');
+                        wordEl.className = 'typewriter-word';
+
+                        // Create individual character spans
+                        w.text.split('').forEach((char, i) => {
+                            const charSpan = document.createElement('span');
+                            charSpan.className = 'typewriter-char';
+                            charSpan.innerText = char;
+                            wordEl.appendChild(charSpan);
+
+                            // Animate each character
+                            gsap.to(charSpan, {
+                                opacity: 1,
+                                delay: i * 0.05,
+                                duration: 0.1,
+                                ease: 'power2.out',
+                                onStart: () => charSpan.classList.add('visible')
+                            });
+                        });
+
+                        wrapper.appendChild(wordEl);
+                    }
+                }
+            },
+            // --- BOUNCE ENGINE ---
+            bounce: {
+                init: (c) => { c.innerHTML = '<div id="bounce-wrapper" class="bounce-container"></div>'; },
+                update: (time, words) => {
+                    const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
+                    const wrapper = document.getElementById('bounce-wrapper');
+
+                    if (activeIdx !== -1 && state.lastRenderedIdx !== activeIdx) {
+                        state.lastRenderedIdx = activeIdx;
+                        const w = words[activeIdx];
+                        wrapper.innerHTML = '';
+
+                        const el = document.createElement('div');
+                        el.className = 'bounce-word';
+                        el.innerText = w.text;
+
+                        // Adjust font size based on word length
+                        const len = w.text.length;
+                        el.style.fontSize = len < 5 ? '4rem' : len < 10 ? '3rem' : '2rem';
+
+                        wrapper.appendChild(el);
+
+                        // Bounce animation
+                        gsap.fromTo(el,
+                            { y: -100, scale: 1.5, opacity: 0 },
+                            {
+                                y: 0, scale: 1, opacity: 1,
+                                duration: 0.4,
+                                ease: 'bounce.out'
+                            }
+                        );
+                    }
+                }
+            },
+            // --- WAVE ENGINE (IMPROVED - SMOOTH) ---
+            wave: {
+                init: (c, words) => {
+                    c.innerHTML = '<div id="wave-wrapper" class="wave-container"></div>';
+                    const wrapper = document.getElementById('wave-wrapper');
+                    state.domElements = [];
+                    state.waveLastActive = -1;
+
+                    words.forEach((w, i) => {
+                        const el = document.createElement('span');
+                        el.innerText = w.text;
+                        el.className = 'wave-word';
+                        el.dataset.index = i;
+                        wrapper.appendChild(el);
+                        state.domElements.push(el);
+                    });
+                },
+                update: (time, words) => {
+                    const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
+
+                    // Only animate when the active word changes
+                    if (activeIdx !== state.waveLastActive) {
+                        state.waveLastActive = activeIdx;
+
+                        state.domElements.forEach((el, i) => {
+                            const isActive = i === activeIdx;
+                            const distance = Math.abs(i - (activeIdx === -1 ? 0 : activeIdx));
+
+                            if (isActive) {
+                                el.classList.add('active');
+                                gsap.to(el, {
+                                    y: -15,
+                                    scale: 1.15,
+                                    duration: 0.3,
+                                    ease: 'power2.out'
+                                });
+                            } else {
+                                el.classList.remove('active');
+                                gsap.to(el, {
+                                    y: 0,
+                                    scale: 1,
+                                    duration: 0.4,
+                                    ease: 'power2.out'
+                                });
+                            }
+
+                            // Smooth opacity based on distance
+                            const newOpacity = distance > 6 ? 0.2 : Math.max(0.3, 1 - (distance * 0.12));
+                            gsap.to(el, { opacity: newOpacity, duration: 0.3 });
+                        });
                     }
                 }
             }
         };
 
-        // --- PARSERS ---
+        // --- UTILS ---
         function parseContent(text, isJson) {
-            if (isJson) {
-                try {
-                    const json = JSON.parse(text);
-                    const segments = json.segments || json;
-                    return segments.flatMap(s => (s.words || []).map(w => ({
-                        text: w.text, start: w.start_time || w.start, end: w.end_time || w.end
-                    })));
-                } catch (e) { return parseSRT(text); }
-            }
+            if (isJson) { try { const json = JSON.parse(text); return (json.segments || json).flatMap(s => (s.words || []).map(w => ({ text: w.text, start: w.start_time || w.start, end: w.end_time || w.end }))); } catch (e) { return parseSRT(text); } }
             return parseSRT(text);
         }
+        function parseSRT(d) { return d.replace(/\r/g, "").split("\n\n").map(b => { const l = b.split("\n"); if (l.length >= 3) { const m = l[1].match(/(\d{2}:\d{2}:\d{2},\d{3}) -->(\d{ 2}: \d{ 2}: \d{ 2}, \d{ 3}) /); if (m) { const toS = t => { const [h, m, s] = t.replace(",", ".").split(":"); return (+h * 3600) + (+m * 60) + (+s); }; const start = toS(m[1]), end = toS(m[2]), txt = l.slice(2).join(" ").trim(), w = txt.split(" "), dur = (end - start) / w.length; return w.map((t, i) => ({ text: t, start: start + i * dur, end: start + (i + 1) * dur })); } } return []; }).flat(); }
 
-        function parseSRT(data) {
-            return data.replace(/\r/g, "").split("\n\n").map(block => {
-                const parts = block.split("\n");
-                if (parts.length >= 3) {
-                    const timeMatch = parts[1].match(/(\d{2}:\d{2}:\d{2},\d{3}) -->(\d{ 2}: \d{ 2}: \d{ 2}, \d{ 3}) /);
-                    if (timeMatch) {
-                        const toSec = t => {
-                            const [h, m, s] = t.replace(",", ".").split(":");
-                            return (+h * 3600) + (+m * 60) + (+s);
-                        };
-                        const start = toSec(timeMatch[1]);
-                        const end = toSec(timeMatch[2]);
-                        const text = parts.slice(2).join(" ").trim();
-                        const words = text.split(" ");
-                        const dur = (end - start) / words.length;
-                        return words.map((w, i) => ({ text: w, start: start + i * dur, end: start + (i + 1) * dur }));
-                    }
-                }
-                return [];
-            }).flat();
-        }
-
-        // --- AUDIO & VISUALS ---
         function initAudio() {
+            if (state.audioCtx) return;
             state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             state.analyser = state.audioCtx.createAnalyser();
             const src = state.audioCtx.createMediaElementSource(ui.audio);
@@ -430,100 +893,251 @@
             state.dataArray = new Uint8Array(state.analyser.frequencyBinCount);
         }
 
-        let particles = [];
-        function initVisuals() {
-            const pc = document.getElementById('particle-canvas');
-            const pCtx = pc.getContext('2d');
-            const wc = document.getElementById('wave-canvas');
-            const wCtx = wc.getContext('2d');
-
-            const resize = () => {
-                pc.width = window.innerWidth; pc.height = window.innerHeight;
-                wc.width = wc.offsetWidth; wc.height = wc.offsetHeight;
-            };
-            window.onresize = resize;
-            resize();
-
-            particles = Array(40).fill().map(() => ({
-                x: Math.random() * pc.width,
-                y: Math.random() * pc.height,
-                size: Math.random() * 3,
-                speed: Math.random() * 0.5 + 0.2
-            }));
-
-            return { pCtx, wCtx, pc, wc };
-        }
-
         let vizCtx;
+        function initVisuals() {
+            const pc = document.getElementById('particle-canvas'); const pCtx = pc.getContext('2d');
+            const wc = document.getElementById('wave-canvas'); const wCtx = wc.getContext('2d');
+            const resize = () => { pc.width = window.innerWidth; pc.height = window.innerHeight; wc.width = wc.offsetWidth; wc.height = wc.offsetHeight; };
+            window.onresize = resize; resize();
+            let particles = Array(40).fill().map(() => ({ x: Math.random() * pc.width, y: Math.random() * pc.height, size: Math.random() * 3, speed: Math.random() * 0.5 + 0.2 }));
+            return { pCtx, wCtx, pc, wc, particles };
+        }
 
         // --- LOOP ---
         function loop() {
             requestAnimationFrame(loop);
 
-            if (state.isPlaying) {
-                const time = ui.audio.currentTime;
-                ui.progress.style.width = (time / ui.audio.duration * 100) + "%";
+            // Progress Bar Update
+            if (!ui.audio.paused) {
+                const pct = (ui.audio.currentTime / ui.audio.duration * 100) || 0;
+                ui.progress.style.width = pct + "%";
+            }
 
-                // Audio Data
-                state.analyser.getByteFrequencyData(state.dataArray);
-                const bass = state.dataArray[2];
+            // Audio Viz
+            if (state.analyser) state.analyser.getByteFrequencyData(state.dataArray);
+            const bass = state.dataArray ? state.dataArray[2] : 0;
 
-                // 1. Lyrics Update
-                const engine = Engines[state.mode];
-                if (engine) engine.update(time, state.words);
+            // Lyrics - apply sync offset
+            const syncedTime = ui.audio.currentTime + state.syncOffset;
+            const engine = Engines[state.mode];
+            if (engine) engine.update(syncedTime, state.words);
 
-                // 2. Visuals Update
-                if (vizCtx) {
-                    // Particles
-                    vizCtx.pCtx.clearRect(0, 0, vizCtx.pc.width, vizCtx.pc.height);
-                    particles.forEach(p => {
-                        p.y -= p.speed * (1 + bass / 100); // Reactive Speed
-                        if (p.y < 0) p.y = vizCtx.pc.height;
-                        vizCtx.pCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                        vizCtx.pCtx.beginPath();
-                        vizCtx.pCtx.arc(p.x, p.y, p.size * (1 + bass / 200), 0, Math.PI * 2); // Reactive Size
-                        vizCtx.pCtx.fill();
-                    });
+            // Visuals
+            if (vizCtx) {
+                vizCtx.pCtx.clearRect(0, 0, vizCtx.pc.width, vizCtx.pc.height);
+                vizCtx.particles.forEach(p => {
+                    p.y -= p.speed * (1 + bass / 100);
+                    if (p.y < 0) p.y = vizCtx.pc.height;
+                    vizCtx.pCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    vizCtx.pCtx.beginPath(); vizCtx.pCtx.arc(p.x, p.y, p.size * (1 + bass / 200), 0, Math.PI * 2); vizCtx.pCtx.fill();
+                });
 
-                    // Waveform
-                    const w = vizCtx.wc.width;
-                    const h = vizCtx.wc.height;
-                    vizCtx.wCtx.clearRect(0, 0, w, h);
-                    vizCtx.wCtx.beginPath();
-                    const sliceWidth = w / state.dataArray.length;
-                    let x = 0;
-                    for (let i = 0; i < state.dataArray.length; i++) {
-                        const v = state.dataArray[i] / 255.0;
-                        const y = h - (v * h);
-                        if (i === 0) vizCtx.wCtx.moveTo(x, y);
-                        else vizCtx.wCtx.lineTo(x, y);
-                        x += sliceWidth;
+                const w = vizCtx.wc.width; const h = vizCtx.wc.height;
+                vizCtx.wCtx.clearRect(0, 0, w, h);
+
+                if (state.dataArray && state.waveType !== 'none') {
+                    const waveColor = state.waveColor;
+
+                    if (state.waveType === 'wave') {
+                        // WAVE MODE
+                        vizCtx.wCtx.beginPath();
+                        const sliceWidth = w / state.dataArray.length; let x = 0;
+                        for (let i = 0; i < state.dataArray.length; i++) {
+                            const v = state.dataArray[i] / 255.0;
+                            const y = h - (v * h);
+                            if (i === 0) vizCtx.wCtx.moveTo(x, y); else vizCtx.wCtx.lineTo(x, y);
+                            x += sliceWidth;
+                        }
+                        vizCtx.wCtx.strokeStyle = waveColor + '80';
+                        vizCtx.wCtx.lineWidth = 2;
+                        vizCtx.wCtx.stroke();
+                    } else if (state.waveType === 'bars') {
+                        // BARS MODE
+                        const barCount = 32;
+                        const barWidth = w / barCount - 2;
+                        for (let i = 0; i < barCount; i++) {
+                            const dataIndex = Math.floor(i * state.dataArray.length / barCount);
+                            const v = state.dataArray[dataIndex] / 255.0;
+                            const barHeight = v * h * 0.9;
+                            const x = i * (barWidth + 2);
+                            const y = h - barHeight;
+
+                            vizCtx.wCtx.fillStyle = waveColor + 'cc';
+                            vizCtx.wCtx.fillRect(x, y, barWidth, barHeight);
+                        }
+                    } else if (state.waveType === 'circle') {
+                        // CIRCLE MODE
+                        const centerX = w / 2;
+                        const centerY = h / 2;
+                        const radius = Math.min(w, h) * 0.3;
+                        const bars = 64;
+
+                        for (let i = 0; i < bars; i++) {
+                            const dataIndex = Math.floor(i * state.dataArray.length / bars);
+                            const v = state.dataArray[dataIndex] / 255.0;
+                            const angle = (i / bars) * Math.PI * 2 - Math.PI / 2;
+                            const barLength = v * radius * 0.8;
+
+                            const x1 = centerX + Math.cos(angle) * radius;
+                            const y1 = centerY + Math.sin(angle) * radius;
+                            const x2 = centerX + Math.cos(angle) * (radius + barLength);
+                            const y2 = centerY + Math.sin(angle) * (radius + barLength);
+
+                            vizCtx.wCtx.beginPath();
+                            vizCtx.wCtx.moveTo(x1, y1);
+                            vizCtx.wCtx.lineTo(x2, y2);
+                            vizCtx.wCtx.strokeStyle = waveColor + 'cc';
+                            vizCtx.wCtx.lineWidth = 3;
+                            vizCtx.wCtx.stroke();
+                        }
                     }
-                    vizCtx.wCtx.strokeStyle = 'rgba(168, 85, 247, 0.5)'; // Primary color
-                    vizCtx.wCtx.lineWidth = 2;
-                    vizCtx.wCtx.stroke();
                 }
             }
         }
 
-        // --- EVENTS ---
-        ui.inputs.audio.onchange = (e) => ui.labels.audio.innerText = e.target.files[0]?.name || "...";
-        ui.inputs.json.onchange = (e) => ui.labels.json.innerText = e.target.files[0]?.name || "...";
-        ui.inputs.video.onchange = (e) => {
-            const f = e.target.files[0];
-            if (f) {
-                ui.video.src = URL.createObjectURL(f);
-                ui.video.classList.remove('hidden');
-                ui.labels.video.innerText = f.name;
+        // --- EVENTS & CONTROLS ---
+        ui.btnPlay.onclick = () => {
+            if (ui.audio.paused) { ui.audio.play(); ui.btnPlay.innerText = "⏸"; state.isPlaying = true; }
+            else { ui.audio.pause(); ui.btnPlay.innerText = "▶"; state.isPlaying = false; }
+        };
+
+        ui.seekBar.onclick = (e) => {
+            const rect = ui.seekBar.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            ui.audio.currentTime = pos * ui.audio.duration;
+        };
+
+        document.getElementById('btn-restart').onclick = () => { ui.audio.currentTime = 0; ui.audio.play(); ui.btnPlay.innerText = "⏸"; };
+
+        // --- SYNC OFFSET CONTROLS ---
+        const syncValueEl = document.getElementById('sync-value');
+
+        function updateSyncDisplay() {
+            const sign = state.syncOffset >= 0 ? '+' : '';
+            syncValueEl.innerText = sign + state.syncOffset.toFixed(1) + 's';
+        }
+
+        document.getElementById('btn-sync-minus').onclick = () => {
+            state.syncOffset -= 0.1;
+            updateSyncDisplay();
+        };
+
+        document.getElementById('btn-sync-plus').onclick = () => {
+            state.syncOffset += 0.1;
+            updateSyncDisplay();
+        };
+
+        // --- FULLSCREEN ---
+        document.getElementById('btn-fullscreen').onclick = () => {
+            const wrapper = document.getElementById('phone-wrapper');
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen().catch(err => {
+                    console.error('Fullscreen error:', err);
+                });
+            } else {
+                document.exitFullscreen();
             }
         };
 
+        // --- COLOR PICKER ---
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.onclick = () => {
+                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                state.primaryColor = option.dataset.color;
+                document.documentElement.style.setProperty('--primary', state.primaryColor);
+            };
+        });
+
+        // --- TOGGLE CONTROLS ---
+        const btnToggle = document.getElementById('btn-toggle-controls');
+        const controlsPanel = document.getElementById('controls');
+        let controlsVisible = true;
+
+        btnToggle.onclick = () => {
+            controlsVisible = !controlsVisible;
+            if (controlsVisible) {
+                controlsPanel.classList.remove('hidden');
+                btnToggle.classList.add('controls-visible');
+                btnToggle.innerText = '⚙️';
+            } else {
+                controlsPanel.classList.add('hidden');
+                btnToggle.classList.remove('controls-visible');
+                btnToggle.innerText = '⚙️';
+            }
+        };
+
+        // --- WAVE COLOR PICKER ---
+        document.querySelectorAll('#wave-color-picker .color-option').forEach(option => {
+            option.onclick = () => {
+                document.querySelectorAll('#wave-color-picker .color-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                state.waveColor = option.dataset.color;
+            };
+        });
+
+        // --- EXPORT (DisplayMedia) ---
+        ui.btnRec.onclick = async () => {
+            if (state.isRecording) {
+                // STOP RECORDING
+                state.recorder.stop();
+                ui.btnRec.innerHTML = "<span>🔴</span> REC";
+                ui.btnRec.classList.remove('bg-red-600');
+                ui.btnRec.classList.add('bg-purple-600');
+                state.isRecording = false;
+            } else {
+                // START RECORDING
+                try {
+                    alert("Choisissez l'onglet 'TikTok Lyrics Creator' dans la fenêtre suivante.");
+                    const stream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { displaySurface: "browser" },
+                        audio: true
+                    });
+
+                    state.recorder = new MediaRecorder(stream);
+                    state.recordedChunks = [];
+
+                    state.recorder.ondataavailable = (e) => { if (e.data.size > 0) state.recordedChunks.push(e.data); };
+
+                    state.recorder.onstop = () => {
+                        const blob = new Blob(state.recordedChunks, { type: "video/mp4" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.style.display = "none";
+                        a.href = url;
+                        a.download = "karaoke_export.mp4";
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        stream.getTracks().forEach(track => track.stop()); // Stop sharing
+                    };
+
+                    state.recorder.start();
+                    state.isRecording = true;
+                    ui.btnRec.innerHTML = "<span>⏹</span> STOP";
+                    ui.btnRec.classList.remove('bg-purple-600');
+                    ui.btnRec.classList.add('bg-red-600');
+
+                    // Auto play if paused
+                    if (ui.audio.paused) ui.btnPlay.click();
+
+                } catch (e) {
+                    console.error(e);
+                    alert("Erreur d'enregistrement: " + e.message);
+                }
+            }
+        };
+
+        ui.inputs.audio.onchange = (e) => ui.labels.audio.innerText = e.target.files[0]?.name || "...";
+        ui.inputs.json.onchange = (e) => ui.labels.json.innerText = e.target.files[0]?.name || "...";
+        ui.inputs.video.onchange = (e) => { const f = e.target.files[0]; if (f) { ui.video.src = URL.createObjectURL(f); ui.video.classList.remove('hidden'); ui.labels.video.innerText = f.name; } };
+
         document.getElementById('btn-start').onclick = async () => {
-            const fa = ui.inputs.audio.files[0];
-            const fj = ui.inputs.json.files[0];
+            const fa = ui.inputs.audio.files[0]; const fj = ui.inputs.json.files[0];
             if (!fa || !fj) return alert("Fichier manquant");
 
             state.mode = ui.inputs.anim.value;
+            state.waveType = document.getElementById('select-wave-type').value;
             const text = await fj.text();
             state.words = parseContent(text, fj.name.endsWith('.json'));
 
@@ -533,15 +1147,13 @@
             ui.setup.style.display = 'none';
             ui.app.style.display = 'flex';
 
-            initAudio();
-            vizCtx = initVisuals();
-
+            initAudio(); vizCtx = initVisuals();
             if (Engines[state.mode].init) Engines[state.mode].init(ui.stage, state.words);
 
-            ui.audio.play();
-            state.isPlaying = true;
+            ui.audio.play(); state.isPlaying = true;
             loop();
         };
+
     </script>
 </body>
 
