@@ -1,532 +1,548 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TikTok Lyrics Creator Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&family=Outfit:wght@400;700;900&display=swap');
 
         :root {
-            --primary: #ffffff;
-            --shadow: rgba(0, 0, 0, 0.8);
+            --primary: #a855f7;
+            --bg: #000000;
         }
 
         body {
             margin: 0;
-            background: #000;
+            background: var(--bg);
             color: white;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Outfit', sans-serif;
             height: 100vh;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Cadre simulation téléphone */
         #phone-wrapper {
             width: 100%;
             height: 100%;
             position: relative;
             overflow: hidden;
             background: #000;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
         @media (min-width: 768px) {
             #phone-wrapper {
-                width: 45vh; /* Ratio 9:16 */
-                height: 90vh;
-                border-radius: 30px;
-                border: 4px solid #222;
+                width: 42vh;
+                height: 88vh;
+                border-radius: 40px;
+                border: 6px solid #1a1a1a;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             }
         }
 
-        /* --- COUCHES (LAYERS) --- */
-        #bg-video-layer {
+        /* LAYERS */
+        #bg-layer-video {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
             z-index: 0;
-            opacity: 0.6; /* Assombrir légèrement pour la lisibilité */
+            opacity: 0.5;
         }
 
         #particle-canvas {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: 1;
             pointer-events: none;
         }
 
         #ui-layer {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            justify-content: center;
         }
 
-        /* --- TYPOGRAPHIE --- */
-        .lyrics-container {
-            padding: 0 15%; /* Marges latérales */
-            text-align: center;
-            /* Positionnement Safe Zone TikTok */
-            margin-top: -10%; 
-        }
-
-        #line {
-            font-size: clamp(1.2rem, 3.5vh, 1.8rem); /* Plus petit, plus élégant */
-            font-weight: 800;
-            line-height: 1.4;
-            color: white;
-            text-shadow: 0 2px 10px var(--shadow);
-            transition: transform 0.1s;
-        }
-
-        .word-span {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(15px);
-            filter: blur(4px);
-            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            margin: 0 3px;
-        }
-
-        .word-visible {
-            opacity: 1;
-            transform: translateY(0);
-            filter: blur(0);
-        }
-
-        .word-highlight {
-            color: var(--primary);
-            text-shadow: 0 0 15px var(--primary);
-        }
-
-        /* --- UI SETUP --- */
-        #setup-screen {
+        /* --- VISUALIZERS --- */
+        #wave-canvas {
             position: absolute;
-            top: 0;
+            bottom: 40px;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: #111;
+            height: 100px;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* --- LYRICS STAGES --- */
+        .lyrics-stage {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* ANIMATION: SCROLL */
+        .scroll-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50vh;
+            padding-bottom: 50vh;
+        }
+
+        .scroll-word {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 8px 0;
+            transition: color 0.1s;
+            text-align: center;
+        }
+
+        .scroll-word.active {
+            color: #fff;
+            font-size: 2.2rem;
+            text-shadow: 0 0 20px var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* ANIMATION: FOCUS */
+        .focus-container {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .focus-word {
+            display: inline-block;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        /* ANIMATION: CLASSIC */
+        .classic-container {
+            position: absolute;
+            bottom: 15%;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .classic-word {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .classic-word.active {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* SETUP & UTILS */
+        #setup-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.98);
             z-index: 50;
-            padding: 30px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .input-card {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            padding: 15px;
-            border-radius: 12px;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
             margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: 0.2s;
         }
-        .input-card:active { transform: scale(0.98); background: #222; }
 
         .progress-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
+            height: 4px;
             background: var(--primary);
             width: 0%;
-            z-index: 100;
-            opacity: 0.7;
-        }
-
-        /* Wave en bas */
-        #waveCanvas {
-            position: absolute;
-            bottom: 50px; /* Un peu au dessus du bas */
-            left: 0;
-            width: 100%;
-            height: 100px;
-            z-index: 5;
-            opacity: 0.8;
-            pointer-events: none;
-        }
-        
-        .hint-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
         }
     </style>
 </head>
+
 <body>
 
-<div id="phone-wrapper">
-    
-    <!-- ARRIÈRE-PLAN VIDÉO (Optionnel) -->
-    <video id="bg-video-layer" loop muted playsinline class="hidden"></video>
-    
-    <!-- PARTICULES -->
-    <canvas id="particle-canvas"></canvas>
+    <div id="phone-wrapper">
+        <video id="bg-layer-video" loop muted playsinline class="hidden"></video>
+        <canvas id="particle-canvas"></canvas>
 
-    <!-- UI LAYER (Lyrics) -->
-    <div id="ui-layer" style="display:none;">
-        <div class="progress-bar" id="progress"></div>
-        <div class="lyrics-container">
-            <div id="line"></div>
+        <div id="ui-layer" style="display:none;">
+            <div id="lyrics-stage" class="lyrics-stage"></div>
+            <canvas id="wave-canvas"></canvas> <!-- RESTORATION -->
+            <div class="progress-bar" id="progress"></div>
         </div>
-        <canvas id="waveCanvas"></canvas>
-        <div class="hint-overlay" id="hint">Tap: Pause • Double Tap: Replay</div>
+
+        <!-- SETUP -->
+        <div id="setup-screen">
+            <h1 class="text-4xl font-black italic mb-8 text-center text-white">KARA<span
+                    class="text-purple-500">GEN</span></h1>
+
+            <label class="glass-panel">
+                <span class="text-2xl">🎵</span>
+                <div class="flex-1 overflow-hidden">
+                    <div class="text-[10px] uppercase text-gray-400 font-bold">Audio</div>
+                    <div id="label-audio" class="truncate font-bold text-sm">Choisir Fichier</div>
+                </div>
+                <input type="file" id="input-audio" accept="audio/*" class="hidden">
+            </label>
+
+            <label class="glass-panel">
+                <span class="text-2xl">📝</span>
+                <div class="flex-1 overflow-hidden">
+                    <div class="text-[10px] uppercase text-gray-400 font-bold">Paroles</div>
+                    <div id="label-json" class="truncate font-bold text-sm">Fichier JSON</div>
+                </div>
+                <input type="file" id="input-json" accept=".json,.srt" class="hidden">
+            </label>
+
+            <label class="glass-panel">
+                <span class="text-2xl">✨</span>
+                <div class="flex-1">
+                    <div class="text-[10px] uppercase text-gray-400 font-bold">Animation</div>
+                    <select id="select-animation" class="bg-transparent w-full font-bold outline-none text-purple-400">
+                        <option value="scroll">📜 Scroll (Liste Défilante)</option>
+                        <option value="focus">🎯 Focus (Big Single)</option>
+                        <option value="classic">🎤 Classic (Sous-titres)</option>
+                    </select>
+                </div>
+            </label>
+
+            <label class="glass-panel">
+                <span class="text-2xl">🎥</span>
+                <div class="flex-1 overflow-hidden">
+                    <div class="text-[10px] uppercase text-gray-400 font-bold">Vidéo (Optionnel)</div>
+                    <div id="label-video" class="truncate font-bold text-sm">Aucune vidéo</div>
+                </div>
+                <input type="file" id="input-video" accept="video/*" class="hidden">
+            </label>
+
+            <button id="btn-start"
+                class="mt-4 bg-purple-600 w-full py-4 rounded-xl font-bold text-lg shadow-lg">START</button>
+        </div>
     </div>
 
-    <!-- SETUP SCREEN -->
-    <div id="setup-screen">
-        <h1 class="text-3xl font-black italic mb-6 text-center tracking-tighter">CREATOR <span class="text-purple-500">STUDIO</span></h1>
-        
-        <label class="input-card">
-            <span class="text-xl">🎵</span>
-            <div class="flex-1">
-                <div class="text-[10px] text-gray-400 uppercase font-bold">Étape 1</div>
-                <div class="text-sm font-bold text-gray-200 truncate" id="audioLabel">Choisir la musique</div>
-            </div>
-            <input type="file" id="audioInput" accept="audio/*" class="hidden">
-        </label>
+    <audio id="audio-player"></audio>
 
-        <label class="input-card">
-            <span class="text-xl">📝</span>
-            <div class="flex-1">
-                <div class="text-[10px] text-gray-400 uppercase font-bold">Étape 2</div>
-                <div class="text-sm font-bold text-gray-200 truncate" id="srtLabel">Fichier SRT</div>
-            </div>
-            <input type="file" id="srtInput" accept=".srt" class="hidden">
-        </label>
-
-        <label class="input-card" style="border-color: #444; background: #222;">
-            <span class="text-xl">🎥</span>
-            <div class="flex-1">
-                <div class="text-[10px] text-gray-400 uppercase font-bold">Optionnel</div>
-                <div class="text-sm font-bold text-gray-200 truncate" id="videoLabel">Fond Vidéo (mp4)</div>
-            </div>
-            <input type="file" id="videoInput" accept="video/*" class="hidden">
-        </label>
-
-        <button id="aiBtn" class="mt-2 py-3 border border-purple-500/30 text-purple-400 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-purple-500/10 transition-colors flex justify-center items-center gap-2">
-            ✨ Auto-Color (Gemini AI)
-        </button>
-
-        <button id="startBtn" class="mt-6 bg-white text-black py-4 rounded-xl font-black text-lg shadow-xl active:scale-95 transition-transform">
-            COMMENCER
-        </button>
-    </div>
-
-</div>
-
-<audio id="audio"></audio>
-
-<script>
-    // DOM Elements
-    const setupScreen = document.getElementById('setup-screen');
-    const uiLayer = document.getElementById('ui-layer');
-    const bgVideo = document.getElementById('bg-video-layer');
-    const audio = document.getElementById('audio');
-    const lineEl = document.getElementById('line');
-    const progress = document.getElementById('progress');
-    const hint = document.getElementById('hint');
-    
-    // Inputs
-    const audioInput = document.getElementById('audioInput');
-    const srtInput = document.getElementById('srtInput');
-    const videoInput = document.getElementById('videoInput');
-    
-    // Buttons
-    const startBtn = document.getElementById('startBtn');
-    const aiBtn = document.getElementById('aiBtn');
-
-    // Contexts
-    let audioCtx, analyser, dataArray;
-    let particleCtx, waveCtx;
-    let particles = [];
-    let subtitles = [];
-    let lastSubIndex = -1;
-    let isPlaying = false;
-    let animationId;
-
-    // Config Visuelle
-    let config = {
-        color: "#a855f7", // Purple par défaut
-        particleCount: 40,
-        mood: "chill"
-    };
-
-    const apiKey = ""; // API Key injectée
-
-    // --- INPUT HANDLERS ---
-    audioInput.onchange = (e) => document.getElementById('audioLabel').innerText = e.target.files[0]?.name || "Choisir la musique";
-    srtInput.onchange = (e) => document.getElementById('srtLabel').innerText = e.target.files[0]?.name || "Fichier SRT";
-    videoInput.onchange = (e) => {
-        const file = e.target.files[0];
-        if(file) {
-            document.getElementById('videoLabel').innerText = file.name;
-            bgVideo.src = URL.createObjectURL(file);
-            bgVideo.classList.remove('hidden');
-        }
-    };
-
-    // --- PARSING SRT ---
-    function parseSRT(data) {
-        return data.replace(/\r/g, "").split("\n\n").map(block => {
-            const lines = block.split("\n");
-            if (lines.length >= 3) {
-                const timeMatch = lines[1].match(/(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/);
-                if (timeMatch) {
-                    const toSec = t => {
-                        const [h, m, s] = t.replace(",", ".").split(":");
-                        return (+h * 3600) + (+m * 60) + (+s);
-                    };
-                    return {
-                        start: toSec(timeMatch[1]),
-                        end: toSec(timeMatch[2]),
-                        text: lines.slice(2).join(" ").trim()
-                    };
-                }
-            }
-            return null;
-        }).filter(Boolean);
-    }
-
-    // --- GEMINI AI COLOR ---
-    aiBtn.onclick = async () => {
-        if(!srtInput.files[0]) return alert("Il faut le fichier SRT d'abord !");
-        
-        aiBtn.innerHTML = "⏳ Analyse...";
-        const text = await srtInput.files[0].text();
-        
-        try {
-            const prompt = `Analyse ces paroles. Donne moi une couleur Hexadécimale qui correspond à l'émotion. Réponds juste avec le code JSON: {"hex": "#RRGGBB"}. Paroles: ${text.substring(0,300)}`;
-            
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
-            });
-            const data = await response.json();
-            const res = JSON.parse(data.candidates[0].content.parts[0].text);
-            
-            config.color = res.hex;
-            document.documentElement.style.setProperty('--primary', config.color);
-            aiBtn.innerHTML = `🎨 Couleur définie !`;
-            aiBtn.style.borderColor = config.color;
-            aiBtn.style.color = config.color;
-        } catch(e) {
-            aiBtn.innerHTML = "❌ Erreur (Défaut)";
-        }
-    };
-
-    // --- PARTICULES SYSTEM ---
-    class Particle {
-        constructor(w, h) {
-            this.w = w; this.h = h;
-            this.reset();
-        }
-        reset() {
-            this.x = Math.random() * this.w;
-            this.y = Math.random() * this.h;
-            this.size = Math.random() * 2;
-            this.speedY = Math.random() * 0.5 + 0.1;
-            this.opacity = Math.random() * 0.5;
-        }
-        update() {
-            this.y -= this.speedY; // Monte doucement
-            if(this.y < 0) this.reset();
-        }
-        draw(ctx) {
-            ctx.fillStyle = config.color;
-            ctx.globalAlpha = this.opacity;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.globalAlpha = 1;
-        }
-    }
-
-    function initParticles() {
-        const cvs = document.getElementById('particle-canvas');
-        particleCtx = cvs.getContext('2d');
-        const updateSize = () => {
-            cvs.width = cvs.offsetWidth;
-            cvs.height = cvs.offsetHeight;
-            particles = Array(config.particleCount).fill().map(() => new Particle(cvs.width, cvs.height));
+    <script>
+        // --- STATE ---
+        const state = {
+            words: [],
+            isPlaying: false,
+            mode: 'scroll',
+            domElements: [],
+            audioCtx: null,
+            analyser: null,
+            dataArray: null
         };
-        window.onresize = updateSize;
-        updateSize();
-    }
 
-    // --- MAIN RENDER LOOP ---
-    function render() {
-        animationId = requestAnimationFrame(render);
-        
-        // 1. Audio Data
-        analyser.getByteFrequencyData(dataArray);
-        const bass = dataArray[2]; // Basse fréquence
+        const ui = {
+            stage: document.getElementById('lyrics-stage'),
+            inputs: {
+                audio: document.getElementById('input-audio'),
+                json: document.getElementById('input-json'),
+                video: document.getElementById('input-video'),
+                anim: document.getElementById('select-animation')
+            },
+            labels: {
+                audio: document.getElementById('label-audio'),
+                json: document.getElementById('label-json'),
+                video: document.getElementById('label-video')
+            },
+            video: document.getElementById('bg-layer-video'),
+            audio: document.getElementById('audio-player'),
+            setup: document.getElementById('setup-screen'),
+            app: document.getElementById('ui-layer'),
+            progress: document.getElementById('progress')
+        };
 
-        // 2. Particules
-        particleCtx.clearRect(0, 0, particleCtx.canvas.width, particleCtx.canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw(particleCtx);
-        });
+        // --- ENGINES ---
+        const Engines = {
+            scroll: {
+                init: (container, words) => {
+                    container.className = 'lyrics-stage flex-col';
+                    container.innerHTML = '<div id="scroll-wrapper" class="scroll-container"></div>';
+                    const wrapper = document.getElementById('scroll-wrapper');
+                    state.domElements = [];
+                    words.forEach((w, i) => {
+                        const el = document.createElement('div');
+                        el.innerText = w.text;
+                        el.className = 'scroll-word';
+                        el.dataset.index = i;
+                        wrapper.appendChild(el);
+                        state.domElements.push(el);
+                    });
+                },
+                update: (time, words) => {
+                    const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
+                    let targetIdx = activeIdx;
+                    if (targetIdx === -1) targetIdx = words.findIndex(w => w.start > time) - 1;
+                    if (targetIdx < 0) targetIdx = 0;
 
-        // 3. Waveform (Subtil en bas)
-        const wCvs = document.getElementById('waveCanvas');
-        if(!waveCtx) waveCtx = wCvs.getContext('2d');
-        if(wCvs.width !== wCvs.offsetWidth) {
-            wCvs.width = wCvs.offsetWidth;
-            wCvs.height = wCvs.offsetHeight;
-        }
-        
-        waveCtx.clearRect(0, 0, wCvs.width, wCvs.height);
-        waveCtx.beginPath();
-        waveCtx.moveTo(0, wCvs.height);
-        const slice = wCvs.width / dataArray.length;
-        let x = 0;
-        for(let i=0; i<dataArray.length; i++) {
-            const v = dataArray[i] / 128.0;
-            const y = wCvs.height - (v * 30); // Hauteur max 30px
-            if(i===0) waveCtx.moveTo(x,y);
-            else waveCtx.lineTo(x,y);
-            x += slice;
-        }
-        waveCtx.strokeStyle = config.color;
-        waveCtx.lineWidth = 2;
-        waveCtx.stroke();
+                    const wrapper = document.getElementById('scroll-wrapper');
+                    state.domElements.forEach((el, i) => {
+                        if (i === activeIdx) el.classList.add('active');
+                        else el.classList.remove('active');
 
-        // 4. Bass Kick effect on Text
-        if(bass > 220) {
-            lineEl.style.transform = `scale(1.05)`;
-            lineEl.style.textShadow = `0 0 20px ${config.color}`;
-        } else {
-            lineEl.style.transform = `scale(1)`;
-            lineEl.style.textShadow = `0 2px 10px rgba(0,0,0,0.8)`;
-        }
-    }
+                        const dist = Math.abs(i - targetIdx);
+                        el.style.opacity = dist > 4 ? 0.1 : 1 - (dist * 0.15);
+                    });
 
-    // --- START LOGIC ---
-    startBtn.onclick = async () => {
-        if(!audioInput.files[0] || !srtInput.files[0]) return alert("Fichiers manquants !");
-        
-        // Setup Audio
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        const src = audioCtx.createMediaElementSource(audio);
-        src.connect(analyser);
-        analyser.connect(audioCtx.destination);
-        analyser.fftSize = 64; // Moins de barres pour performance
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        // Load Content
-        subtitles = parseSRT(await srtInput.files[0].text());
-        audio.src = URL.createObjectURL(audioInput.files[0]);
-        if(videoInput.files[0]) bgVideo.play();
-
-        // UI Switch
-        setupScreen.style.display = 'none';
-        uiLayer.style.display = 'flex';
-        initParticles();
-
-        // Play
-        audio.play();
-        bgVideo.play().catch(e => {}); // Au cas où pas de vidéo
-        isPlaying = true;
-        render();
-
-        // Show Hint temporarily
-        hint.style.opacity = 1;
-        setTimeout(() => hint.style.opacity = 0, 3000);
-    };
-
-    // --- SYNC & CONTROLS ---
-    audio.ontimeupdate = () => {
-        const t = audio.currentTime;
-        progress.style.width = (t / audio.duration * 100) + "%";
-
-        const index = subtitles.findIndex(s => t >= s.start && t <= s.end);
-        if(index !== -1 && index !== lastSubIndex) {
-            lastSubIndex = index;
-            // Animation Mot par Mot propre
-            lineEl.innerHTML = "";
-            const words = subtitles[index].text.split(" ");
-            words.forEach((w, i) => {
-                const s = document.createElement('span');
-                s.innerText = w;
-                s.className = 'word-span';
-                if(Math.random() > 0.7) s.classList.add('word-highlight'); // Random highlight
-                lineEl.appendChild(s);
-                setTimeout(() => s.classList.add('word-visible'), i * 50);
-            });
-        } else if (index === -1) {
-            // Optionnel : Effacer ou garder le dernier texte
-        }
-    };
-
-    // Touch Controls
-    const wrapper = document.getElementById('phone-wrapper');
-    let lastTap = 0;
-    
-    wrapper.onclick = (e) => {
-        const now = new Date().getTime();
-        const tapLen = now - lastTap;
-        
-        if (tapLen < 300 && tapLen > 0) {
-            // Double Tap -> Replay
-            audio.currentTime = 0;
-            if(!isPlaying) audio.play();
-            lastSubIndex = -1;
-            lineEl.innerHTML = "";
-        } else {
-            // Single Tap -> Pause/Play
-            // Petit délai pour vérifier si c'est un double tap
-            setTimeout(() => {
-                if (new Date().getTime() - lastTap >= 300) {
-                     if(isPlaying) {
-                        audio.pause();
-                        if(bgVideo.src) bgVideo.pause();
-                        isPlaying = false;
-                        hint.innerText = "Pause";
-                        hint.style.opacity = 1;
-                    } else {
-                        audio.play();
-                        if(bgVideo.src) bgVideo.play();
-                        isPlaying = true;
-                        hint.style.opacity = 0;
+                    const targetEl = state.domElements[targetIdx];
+                    if (targetEl) {
+                        const itemY = targetEl.offsetTop;
+                        const itemH = targetEl.offsetHeight;
+                        const stageH = ui.stage.offsetHeight;
+                        const desiredY = (stageH / 2) - (itemY + itemH / 2);
+                        gsap.to(wrapper, { y: desiredY, duration: 0.5, ease: "power2.out" });
                     }
                 }
-            }, 300);
-        }
-        lastTap = now;
-    };
+            },
+            focus: {
+                init: (container) => {
+                    container.innerHTML = '<div id="focus-wrapper" class="focus-container"></div>';
+                },
+                update: (time, words) => {
+                    const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
+                    const wrapper = document.getElementById('focus-wrapper');
+                    if (activeIdx !== -1 && state.lastRenderedIdx !== activeIdx) {
+                        state.lastRenderedIdx = activeIdx;
+                        const w = words[activeIdx];
+                        wrapper.innerHTML = '';
+                        const el = document.createElement('div');
+                        el.innerText = w.text;
+                        const len = w.text.length;
+                        const size = len < 5 ? '5rem' : len < 10 ? '3.5rem' : '2.5rem';
+                        el.className = 'focus-word';
+                        el.style.fontSize = size;
+                        el.style.color = '#fff';
+                        el.style.textShadow = '0 0 30px var(--primary)';
+                        wrapper.appendChild(el);
+                        gsap.fromTo(el, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.5)' });
+                    }
+                }
+            },
+            classic: {
+                init: (container) => {
+                    container.innerHTML = '<div id="classic-wrapper" class="classic-container"></div>';
+                },
+                update: (time, words) => {
+                    const activeIdx = words.findIndex(w => time >= w.start && time <= w.end);
+                    let centerIdx = activeIdx;
+                    if (centerIdx === -1) centerIdx = words.findIndex(w => w.start > time) - 1;
+                    if (centerIdx < 0) centerIdx = 0;
 
-</script>
+                    if (state.lastRenderedIdx === centerIdx && activeIdx === state.lastCheckActive) return;
+                    state.lastRenderedIdx = centerIdx;
+                    state.lastCheckActive = activeIdx;
+
+                    const wrapper = document.getElementById('classic-wrapper');
+                    wrapper.innerHTML = '';
+                    const start = Math.max(0, centerIdx - 2);
+                    const end = Math.min(words.length, centerIdx + 5);
+
+                    for (let i = start; i < end; i++) {
+                        const w = words[i];
+                        const el = document.createElement('span');
+                        el.innerText = w.text;
+                        el.className = 'classic-word';
+                        if (i === activeIdx) el.classList.add('active');
+                        wrapper.appendChild(el);
+                    }
+                }
+            }
+        };
+
+        // --- PARSERS ---
+        function parseContent(text, isJson) {
+            if (isJson) {
+                try {
+                    const json = JSON.parse(text);
+                    const segments = json.segments || json;
+                    return segments.flatMap(s => (s.words || []).map(w => ({
+                        text: w.text, start: w.start_time || w.start, end: w.end_time || w.end
+                    })));
+                } catch (e) { return parseSRT(text); }
+            }
+            return parseSRT(text);
+        }
+
+        function parseSRT(data) {
+            return data.replace(/\r/g, "").split("\n\n").map(block => {
+                const parts = block.split("\n");
+                if (parts.length >= 3) {
+                    const timeMatch = parts[1].match(/(\d{2}:\d{2}:\d{2},\d{3}) -->(\d{ 2}: \d{ 2}: \d{ 2}, \d{ 3}) /);
+                    if (timeMatch) {
+                        const toSec = t => {
+                            const [h, m, s] = t.replace(",", ".").split(":");
+                            return (+h * 3600) + (+m * 60) + (+s);
+                        };
+                        const start = toSec(timeMatch[1]);
+                        const end = toSec(timeMatch[2]);
+                        const text = parts.slice(2).join(" ").trim();
+                        const words = text.split(" ");
+                        const dur = (end - start) / words.length;
+                        return words.map((w, i) => ({ text: w, start: start + i * dur, end: start + (i + 1) * dur }));
+                    }
+                }
+                return [];
+            }).flat();
+        }
+
+        // --- AUDIO & VISUALS ---
+        function initAudio() {
+            state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            state.analyser = state.audioCtx.createAnalyser();
+            const src = state.audioCtx.createMediaElementSource(ui.audio);
+            src.connect(state.analyser);
+            state.analyser.connect(state.audioCtx.destination);
+            state.analyser.fftSize = 256;
+            state.dataArray = new Uint8Array(state.analyser.frequencyBinCount);
+        }
+
+        let particles = [];
+        function initVisuals() {
+            const pc = document.getElementById('particle-canvas');
+            const pCtx = pc.getContext('2d');
+            const wc = document.getElementById('wave-canvas');
+            const wCtx = wc.getContext('2d');
+
+            const resize = () => {
+                pc.width = window.innerWidth; pc.height = window.innerHeight;
+                wc.width = wc.offsetWidth; wc.height = wc.offsetHeight;
+            };
+            window.onresize = resize;
+            resize();
+
+            particles = Array(40).fill().map(() => ({
+                x: Math.random() * pc.width,
+                y: Math.random() * pc.height,
+                size: Math.random() * 3,
+                speed: Math.random() * 0.5 + 0.2
+            }));
+
+            return { pCtx, wCtx, pc, wc };
+        }
+
+        let vizCtx;
+
+        // --- LOOP ---
+        function loop() {
+            requestAnimationFrame(loop);
+
+            if (state.isPlaying) {
+                const time = ui.audio.currentTime;
+                ui.progress.style.width = (time / ui.audio.duration * 100) + "%";
+
+                // Audio Data
+                state.analyser.getByteFrequencyData(state.dataArray);
+                const bass = state.dataArray[2];
+
+                // 1. Lyrics Update
+                const engine = Engines[state.mode];
+                if (engine) engine.update(time, state.words);
+
+                // 2. Visuals Update
+                if (vizCtx) {
+                    // Particles
+                    vizCtx.pCtx.clearRect(0, 0, vizCtx.pc.width, vizCtx.pc.height);
+                    particles.forEach(p => {
+                        p.y -= p.speed * (1 + bass / 100); // Reactive Speed
+                        if (p.y < 0) p.y = vizCtx.pc.height;
+                        vizCtx.pCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                        vizCtx.pCtx.beginPath();
+                        vizCtx.pCtx.arc(p.x, p.y, p.size * (1 + bass / 200), 0, Math.PI * 2); // Reactive Size
+                        vizCtx.pCtx.fill();
+                    });
+
+                    // Waveform
+                    const w = vizCtx.wc.width;
+                    const h = vizCtx.wc.height;
+                    vizCtx.wCtx.clearRect(0, 0, w, h);
+                    vizCtx.wCtx.beginPath();
+                    const sliceWidth = w / state.dataArray.length;
+                    let x = 0;
+                    for (let i = 0; i < state.dataArray.length; i++) {
+                        const v = state.dataArray[i] / 255.0;
+                        const y = h - (v * h);
+                        if (i === 0) vizCtx.wCtx.moveTo(x, y);
+                        else vizCtx.wCtx.lineTo(x, y);
+                        x += sliceWidth;
+                    }
+                    vizCtx.wCtx.strokeStyle = 'rgba(168, 85, 247, 0.5)'; // Primary color
+                    vizCtx.wCtx.lineWidth = 2;
+                    vizCtx.wCtx.stroke();
+                }
+            }
+        }
+
+        // --- EVENTS ---
+        ui.inputs.audio.onchange = (e) => ui.labels.audio.innerText = e.target.files[0]?.name || "...";
+        ui.inputs.json.onchange = (e) => ui.labels.json.innerText = e.target.files[0]?.name || "...";
+        ui.inputs.video.onchange = (e) => {
+            const f = e.target.files[0];
+            if (f) {
+                ui.video.src = URL.createObjectURL(f);
+                ui.video.classList.remove('hidden');
+                ui.labels.video.innerText = f.name;
+            }
+        };
+
+        document.getElementById('btn-start').onclick = async () => {
+            const fa = ui.inputs.audio.files[0];
+            const fj = ui.inputs.json.files[0];
+            if (!fa || !fj) return alert("Fichier manquant");
+
+            state.mode = ui.inputs.anim.value;
+            const text = await fj.text();
+            state.words = parseContent(text, fj.name.endsWith('.json'));
+
+            ui.audio.src = URL.createObjectURL(fa);
+            if (ui.video.src) ui.video.play();
+
+            ui.setup.style.display = 'none';
+            ui.app.style.display = 'flex';
+
+            initAudio();
+            vizCtx = initVisuals();
+
+            if (Engines[state.mode].init) Engines[state.mode].init(ui.stage, state.words);
+
+            ui.audio.play();
+            state.isPlaying = true;
+            loop();
+        };
+    </script>
 </body>
+
 </html>
